@@ -1,0 +1,27 @@
+name: Configure
+run-name: ${{ github.actor }} first CMakeLists
+on: [push]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: check
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Create
+        run: cmake -H. -B_build
+      - name: make
+        run: cmake --build _build
+      - name: make run
+        run: ./_build/ammo
+      - name: Create testing
+        run: |
+          cmake -H. -B_build -DBUILD_TESTS=ON
+          cmake --build _build
+          cmake --build _build --target test -- ARGS=--verbose
+      - name: Upload-art submodule
+        uses: actions/upload-artifact@v4
+        with:
+          name: compiled_main_cpp
+          path: _build/ammo
